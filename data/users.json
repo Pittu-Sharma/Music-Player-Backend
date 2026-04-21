@@ -1,0 +1,54 @@
+[
+  {
+    "_id": "1775811558345",
+    "username": "love4",
+    "email": "love@gmail.com",
+    "password": "$2b$12$w.0quYfngfnfu5s1kj889OpzXbZJSm5hOcaV8Jw0cd16mi3tKTEji",
+    "favorites": [],
+    "playlists": [],
+    "createdAt": "2026-04-10T08:59:18.345Z"
+  },
+  {
+    "_id": "1776166526406",
+    "username": "testuser_debug",
+    "email": "testdebug@gmail.com",
+    "password": "$2b$12$RfucZquDc.IsA2HTsDhYB.AKkVCu4DBRoRlaF.jBhiNWF77jVfJby",
+    "favorites": [],
+    "playlists": [],
+    "createdAt": "2026-04-14T11:35:26.406Z"
+  },
+  {
+    "_id": "1776166948900",
+    "username": "pittu3",
+    "email": "pittu3@gmail.com",
+    "password": "$2b$12$vj4.QVw4lWbHyfB3hmjsEO4SvKNivFSfm4l98aR9Om6Rv6yC.PlVa",
+    "favorites": [],
+    "playlists": [
+      {
+        "_id": "1776167484670",
+        "name": "fav",
+        "description": "",
+        "tracks": []
+      },
+      {
+        "_id": "1776249099132",
+        "name": "pittu",
+        "description": "",
+        "tracks": []
+      },
+      {
+        "_id": "1776249751975",
+        "name": "me",
+        "description": "",
+        "tracks": []
+      },
+      {
+        "_id": "1776251568598",
+        "name": "mee",
+        "description": "",
+        "tracks": []
+      }
+    ],
+    "createdAt": "2026-04-14T11:42:28.900Z"
+  }
+]

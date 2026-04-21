@@ -14,6 +14,11 @@ const streamCacheSchema = new mongoose.Schema({
   title: String,
   thumbnail: String,
   duration: Number,
+  episodesData: String,
+  updatedAt: {
+    type: Date,
+    default: Date.now
+  },
   createdAt: {
     type: Date,
     default: Date.now,
