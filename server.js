@@ -8,6 +8,7 @@ const authRoutes = require('./routes/authRoutes');
 const musicRoutes = require('./routes/musicRoutes');
 const favoriteRoutes = require('./routes/favoriteRoutes');
 const playlistRoutes = require('./routes/playlistRoutes');
+const aiRoutes = require('./routes/aiRoutes');
 const dbService = require('./services/dbService');
 
 
@@ -22,6 +23,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/music', musicRoutes);
 app.use('/api/favorites', favoriteRoutes);
 app.use('/api/playlists', playlistRoutes);
+app.use('/api/ai', aiRoutes);
 
 
 app.get('/', (req, res) => {

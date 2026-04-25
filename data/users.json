@@ -50,5 +50,56 @@
       }
     ],
     "createdAt": "2026-04-14T11:42:28.900Z"
+  },
+  {
+    "_id": "1776852749290",
+    "username": "pittusharma",
+    "email": "pittu@gmail.com",
+    "password": "$2b$12$iT8GCupF1RIrTLuRDU2hFuXfZ3tVunQWBOY005zrPiyl/TKyQ4NzS",
+    "favorites": [
+      {
+        "id": 1635027392,
+        "title": "Kesariya",
+        "preview": "https://video-ssl.itunes.apple.com/itunes-assets/Video112/v4/c1/69/ef/c169ef0d-3446-fde8-97e9-937883ff5daf/mzvf_16690304894220100033.1920w.h264lc.U.p.m4v",
+        "artist": {
+          "name": "Pritam, Arijit Singh & Amitabh Bhattacharya"
+        },
+        "album": {
+          "cover_medium": "https://is1-ssl.mzstatic.com/image/thumb/Video122/v4/27/c4/18/27c41885-8630-1ce1-860b-4b53d252261e/1965893234460101.jpg/600x600bb.jpg"
+        }
+      },
+      {
+        "id": 1281419736,
+        "title": "Channa Mereya (From \"Ae Dil Hai Mushkil\")",
+        "preview": "https://video-ssl.itunes.apple.com/itunes-assets/Video114/v4/fd/2a/29/fd2a297e-946f-731b-e6ff-7f71b13a633e/mzvf_2126499313778297113.1920w.h264lc.U.p.m4v",
+        "artist": {
+          "name": "Pritam & Arijit Singh"
+        },
+        "album": {
+          "cover_medium": "https://is1-ssl.mzstatic.com/image/thumb/Video124/v4/86/4d/49/864d494e-c805-4143-b070-775adb7b58fe/8864467252220101VIC.jpg/600x600bb.jpg"
+        }
+      }
+    ],
+    "playlists": [
+      {
+        "_id": "1776852769699",
+        "name": "fav",
+        "description": "",
+        "tracks": [
+          {
+            "id": 1635027392,
+            "title": "Kesariya",
+            "preview": "https://video-ssl.itunes.apple.com/itunes-assets/Video112/v4/c1/69/ef/c169ef0d-3446-fde8-97e9-937883ff5daf/mzvf_16690304894220100033.1920w.h264lc.U.p.m4v",
+            "artist": {
+              "name": "Pritam, Arijit Singh & Amitabh Bhattacharya"
+            },
+            "album": {
+              "cover_medium": "https://is1-ssl.mzstatic.com/image/thumb/Video122/v4/27/c4/18/27c41885-8630-1ce1-860b-4b53d252261e/1965893234460101.jpg/600x600bb.jpg"
+            }
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-04-22T10:12:29.290Z"
   }
 ]
