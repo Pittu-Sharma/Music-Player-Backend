@@ -313,38 +313,45 @@ const proxyAudio = async (req, res) => {
 
   console.log(`[Proxy] Routing stream: ${url.substring(0, 60)}...`);
 
-  const parsedUrl = new URL(url);
-  const options = {
-    method: 'GET',
-    headers: {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-      'Referer': 'https://www.youtube.com/',
-      'Range': req.headers.range || 'bytes=0-'
-    }
-  };
+  try {
+    const parsedUrl = new URL(url);
+    const options = {
+      method: 'GET',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'Accept': '*/*',
+        'Range': req.headers.range || 'bytes=0-'
+      }
+    };
 
-  const client = parsedUrl.protocol === 'https:' ? https : http;
+    const client = parsedUrl.protocol === 'https:' ? https : http;
 
-  const proxyReq = client.request(url, options, (proxyRes) => {
-    // Pass through status and headers
-    res.writeHead(proxyRes.statusCode, {
-      'Access-Control-Allow-Origin': '*',
-      'Content-Type': proxyRes.headers['content-type'] || 'audio/mpeg',
-      'Accept-Ranges': 'bytes',
-      'Content-Length': proxyRes.headers['content-length'],
-      'Content-Range': proxyRes.headers['content-range'],
-      'Cache-Control': 'no-cache'
+    const proxyReq = client.request(url, options, (proxyRes) => {
+      // Passthrough only essential headers
+      const headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': proxyRes.headers['content-type'] || 'audio/mpeg',
+        'Accept-Ranges': 'bytes',
+        'Cache-Control': 'no-cache'
+      };
+
+      if (proxyRes.headers['content-length']) headers['Content-Length'] = proxyRes.headers['content-length'];
+      if (proxyRes.headers['content-range']) headers['Content-Range'] = proxyRes.headers['content-range'];
+
+      res.writeHead(proxyRes.statusCode, headers);
+      proxyRes.pipe(res);
     });
 
-    proxyRes.pipe(res);
-  });
+    proxyReq.on('error', (err) => {
+      console.error('[Proxy] Client Request Error:', err.message);
+      if (!res.headersSent) res.status(500).send('Proxy error');
+    });
 
-  proxyReq.on('error', (err) => {
-    console.error('[Proxy] Connection error:', err.message);
-    res.status(500).send('Proxy error');
-  });
-
-  proxyReq.end();
+    proxyReq.end();
+  } catch (error) {
+    console.error('[Proxy] Main Error:', error.message);
+    if (!res.headersSent) res.status(500).send('Invalid URL');
+  }
 };
 
 module.exports = { 
