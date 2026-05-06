@@ -18,6 +18,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.get('/proxy', proxyAudio);
+app.get('/test', (req, res) => res.send('Server is up and routing works!'));
 
 app.use(cors());
 app.use(express.json());
