@@ -4,13 +4,14 @@ const aiService = require('../services/aiService');
 const musicGenService = require('../services/musicGenService');
 
 router.get('/mood', async (req, res) => {
-  const { mood } = req.query;
+  const { mood, lang } = req.query;
   if (!mood) {
     return res.status(400).json({ message: 'Mood is required' });
   }
 
   try {
-    const recommendations = await aiService.getMoodRecommendations(mood);
+    const recommendations = await aiService.getMoodRecommendations(mood, lang);
+
     res.json(recommendations);
   } catch (error) {
     console.error('Error in /api/ai/mood (GET) route:', error);
@@ -19,28 +20,30 @@ router.get('/mood', async (req, res) => {
 });
 
 router.post('/mood', async (req, res) => {
-  const { mood } = req.body;
+  const { mood, lang } = req.body;
   if (!mood) {
     return res.status(400).json({ message: 'Mood is required' });
   }
 
   try {
-    const recommendations = await aiService.getMoodRecommendations(mood);
+    const recommendations = await aiService.getMoodRecommendations(mood, lang);
+
     res.json(recommendations);
   } catch (error) {
     console.error('Error in /api/ai/mood route:', error);
     res.status(500).json({ message: 'Error generating mood recommendations' });
   }
 });
-
 router.post('/create', async (req, res) => {
-  const { theme, voice, genre } = req.body;
-  if (!theme || !voice || !genre) {
-    return res.status(400).json({ message: 'Theme, voice, and genre are required' });
+  console.log('[AI Create] Incoming Request:', req.body);
+  const { theme, voiceStyle, genre, lang, lyrics } = req.body;
+  if (!theme || !voiceStyle || !genre) {
+    console.warn('[AI Create] Missing fields:', { theme, voiceStyle, genre });
+    return res.status(400).json({ message: 'Theme, voiceStyle, and genre are required' });
   }
 
   try {
-    const song = await aiService.generateSong(theme, voice, genre);
+    const song = await aiService.generateSong(theme, voiceStyle, genre, lang, lyrics);
     res.json(song);
   } catch (error) {
     console.error('Error in /api/ai/create route:', error);
@@ -49,10 +52,10 @@ router.post('/create', async (req, res) => {
 });
 
 router.post('/generate-audio', async (req, res) => {
-  const { theme, voice, genre, lyrics } = req.body;
+  const { theme, voice, genre, lyrics, voiceStyle } = req.body;
   
   try {
-    const audioData = await musicGenService.generateAudio(theme, voice, genre, lyrics);
+    const audioData = await musicGenService.generateAudio(theme, voiceStyle || voice, genre, lyrics);
     res.set('Content-Type', 'audio/wav');
     res.send(Buffer.from(audioData));
   } catch (error) {

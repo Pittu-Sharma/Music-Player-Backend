@@ -9,7 +9,9 @@ const musicRoutes = require('./routes/musicRoutes');
 const favoriteRoutes = require('./routes/favoriteRoutes');
 const playlistRoutes = require('./routes/playlistRoutes');
 const aiRoutes = require('./routes/aiRoutes');
+const subscriptionRoutes = require('./routes/subscriptionRoutes');
 const dbService = require('./services/dbService');
+const { proxyAudio } = require('./controllers/musicController');
 
 
 const app = express();
@@ -20,10 +22,14 @@ app.use(express.json());
 
 
 app.use('/api/auth', authRoutes);
+app.get('/api/music/proxy', proxyAudio); // Handle proxy before music routes
 app.use('/api/music', musicRoutes);
 app.use('/api/favorites', favoriteRoutes);
 app.use('/api/playlists', playlistRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/subscriptions', subscriptionRoutes);
+app.use('/music', express.static('music')); 
+
 
 
 app.get('/', (req, res) => {

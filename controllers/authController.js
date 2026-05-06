@@ -13,7 +13,17 @@ const register = async (req, res) => {
     const newUser = await dbService.createUser({ username, email, password: hashedPassword });
 
     const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
-    res.status(201).json({ user: { id: newUser._id, username, email }, token });
+    res.status(201).json({ 
+      user: { 
+        id: newUser._id, 
+        username, 
+        email,
+        isPremium: false,
+        subscriptionPlan: 'free',
+        subscriptionExpiresAt: null
+      }, 
+      token 
+    });
   } catch (error) {
     console.error('Registration error:', error.message);
     if (error.name === 'MongooseServerSelectionError' || error.message.includes('SSL')) {
@@ -33,7 +43,17 @@ const login = async (req, res) => {
     if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
-    res.status(200).json({ user: { id: user._id, username: user.username, email: user.email }, token });
+    res.status(200).json({
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        isPremium: user.isPremium || false,
+        subscriptionPlan: user.subscriptionPlan || 'free',
+        subscriptionExpiresAt: user.subscriptionExpiresAt || null
+      },
+      token
+    });
   } catch (error) {
     console.error('Login error:', error.message);
     if (error.name === 'MongooseServerSelectionError' || error.message.includes('SSL')) {

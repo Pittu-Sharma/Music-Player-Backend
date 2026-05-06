@@ -9,7 +9,11 @@ const userSchema = new mongoose.Schema({
     name: { type: String, required: true },
     description: { type: String },
     tracks: [{ type: Object }]
-  }]
+  }],
+  isPremium: { type: Boolean, default: false },
+  subscriptionPlan: { type: String, enum: ['free', 'pro', 'elite'], default: 'free' },
+  subscriptionExpiresAt: { type: Date },
+  recentlyPlayed: [{ type: Object }] // Capped list of recent tracks
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);
