@@ -154,9 +154,6 @@ const resolveStreamUrl = async (req, res) => {
   const { artist, title } = req.query;
   if (!artist || !title) return res.status(400).json({ message: 'Artist and title are required' });
 
-  const localUrl = getLocalMusicUrl(title);
-  if (localUrl) return res.json({ url: localUrl, title: title });
-
   const query = `${artist} - ${title}`.toLowerCase();
   const isDbConnected = mongoose.connection.readyState === 1;
 
@@ -166,24 +163,28 @@ const resolveStreamUrl = async (req, res) => {
       if (cachedStream) return res.json({ url: cachedStream.url, title: cachedStream.title, duration: cachedStream.duration });
     }
 
-    console.log(`[Resolve] Starting yt-dlp for: ${artist} - ${title}`);
-    const result = await ytDlp(`ytsearch1:${artist} ${title} official full audio`, {
-      dumpSingleJson: true,
-      noCheckCertificates: true,
-      preferFreeFormats: true,
-      format: 'ba[ext=m4a]/ba[ext=mp3]/bestaudio/best',
-    });
+    console.log(`[Resolve] Attempting to resolve: ${artist} - ${title}`);
+    
+    // Fallback: If yt-dlp is not available or fails, return 404 gracefully so frontend can use preview
+    try {
+      const result = await ytDlp(`ytsearch1:${artist} ${title} official audio`, {
+        dumpSingleJson: true,
+        noCheckCertificates: true,
+        format: 'ba/best',
+      });
 
-    if (result && result.entries?.[0]) {
-      const entry = result.entries[0];
-      console.log(`[Resolve] Found stream: ${entry.title} (${entry.duration}s)`);
-      if (isDbConnected) {
-        await StreamCache.create({ query, url: entry.url, title: entry.title, duration: entry.duration });
+      if (result && result.entries?.[0]) {
+        const entry = result.entries[0];
+        if (isDbConnected) {
+          await StreamCache.create({ query, url: entry.url, title: entry.title, duration: entry.duration });
+        }
+        return res.json({ url: entry.url, title: entry.title, duration: entry.duration });
       }
-      return res.json({ url: entry.url, title: entry.title, duration: entry.duration });
+    } catch (e) {
+      console.warn(`[Resolve] yt-dlp failed or missing: ${e.message}`);
     }
 
-    res.status(404).json({ message: 'Could not resolve audio stream' });
+    res.status(404).json({ message: 'Audio stream not available' });
   } catch (error) {
     res.status(500).json({ message: 'Error resolving stream' });
   }
@@ -314,43 +315,30 @@ const proxyAudio = async (req, res) => {
   console.log(`[Proxy] Routing stream: ${url.substring(0, 60)}...`);
 
   try {
-    const parsedUrl = new URL(url);
-    const options = {
-      method: 'GET',
+    const response = await axios({
+      method: 'get',
+      url: url,
+      responseType: 'stream',
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-        'Accept': '*/*',
         'Range': req.headers.range || 'bytes=0-'
       }
-    };
-
-    const client = parsedUrl.protocol === 'https:' ? https : http;
-
-    const proxyReq = client.request(url, options, (proxyRes) => {
-      // Passthrough only essential headers
-      const headers = {
-        'Access-Control-Allow-Origin': '*',
-        'Content-Type': proxyRes.headers['content-type'] || 'audio/mpeg',
-        'Accept-Ranges': 'bytes',
-        'Cache-Control': 'no-cache'
-      };
-
-      if (proxyRes.headers['content-length']) headers['Content-Length'] = proxyRes.headers['content-length'];
-      if (proxyRes.headers['content-range']) headers['Content-Range'] = proxyRes.headers['content-range'];
-
-      res.writeHead(proxyRes.statusCode, headers);
-      proxyRes.pipe(res);
     });
 
-    proxyReq.on('error', (err) => {
-      console.error('[Proxy] Client Request Error:', err.message);
-      if (!res.headersSent) res.status(500).send('Proxy error');
+    res.writeHead(response.status, {
+      'Access-Control-Allow-Origin': '*',
+      'Content-Type': response.headers['content-type'] || 'audio/mpeg',
+      'Content-Length': response.headers['content-length'],
+      'Content-Range': response.headers['content-range'],
+      'Accept-Ranges': 'bytes',
     });
 
-    proxyReq.end();
+    response.data.pipe(res);
   } catch (error) {
-    console.error('[Proxy] Main Error:', error.message);
-    if (!res.headersSent) res.status(500).send('Invalid URL');
+    console.error('[Proxy Error]', error.message);
+    if (!res.headersSent) {
+      res.status(error.response?.status || 500).send('Proxy error');
+    }
   }
 };
 
