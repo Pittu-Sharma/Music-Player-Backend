@@ -62,6 +62,8 @@ mongoose.connect(process.env.MONGO_URI, {
 // Initialize local data storage if needed
 dbService.ensureDataDir();
 
+app.get('/test-final', (req, res) => res.send('Final routing check works!'));
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
