@@ -23,4 +23,5 @@ router.get('/fresh-arrivals', getFreshArrivals);
 router.get('/recently-played', auth, getRecentlyPlayed);
 router.post('/recently-played', auth, addToRecentlyPlayed);
 
+router.get('/test-music', (req, res) => res.send('Music routes are working!'));
 module.exports = router;
