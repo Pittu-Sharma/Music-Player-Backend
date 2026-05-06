@@ -22,7 +22,6 @@ app.use(express.json());
 
 
 app.use('/api/auth', authRoutes);
-app.get('/api/music/proxy', proxyAudio); // Handle proxy before music routes
 app.use('/api/music', musicRoutes);
 app.use('/api/favorites', favoriteRoutes);
 app.use('/api/playlists', playlistRoutes);
