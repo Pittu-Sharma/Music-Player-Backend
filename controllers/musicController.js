@@ -190,6 +190,8 @@ const resolveStreamUrl = async (req, res) => {
   }
 };
 
+const yts = require('yt-search');
+
 const getCartoonEpisodes = async (req, res) => {
   const { query } = req.query;
   if (!query) return res.status(400).json({ message: 'Query is required' });
@@ -201,19 +203,20 @@ const getCartoonEpisodes = async (req, res) => {
       if (cached?.episodesData) return res.json({ data: JSON.parse(cached.episodesData) });
     }
 
-    const result = await ytDlp(`ytsearch100:${query} official episodes`, {
-      dumpSingleJson: true,
-      noCheckCertificates: true,
-      flatPlaylist: true,
-    });
+    console.log(`[Cartoon] Searching for episodes: ${query}`);
+    const searchResults = await yts(`${query} official episodes`);
+    const videos = searchResults.videos.slice(0, 50);
 
-    if (result?.entries) {
-      const episodes = result.entries.map(e => ({
-        id: e.id, title: e.title,
-        thumbnail: e.thumbnails?.[0]?.url || `https://i.ytimg.com/vi/${e.id}/hqdefault.jpg`,
-        duration: e.duration
+    if (videos && videos.length > 0) {
+      const episodes = videos.map(v => ({
+        id: v.videoId, 
+        title: v.title,
+        thumbnail: v.thumbnail || v.image,
+        duration: v.seconds,
+        author: v.author.name
       }));
-      if (isDbConnected && episodes.length > 0) {
+      
+      if (isDbConnected) {
         await StreamCache.findOneAndUpdate(
           { query: `cartoon:${query}`.toLowerCase() },
           { episodesData: JSON.stringify(episodes), updatedAt: new Date() },
@@ -224,6 +227,7 @@ const getCartoonEpisodes = async (req, res) => {
     }
     res.json({ data: [] });
   } catch (error) {
+    console.error('[Cartoon Error]', error.message);
     res.status(500).json({ message: 'Error fetching episodes' });
   }
 };
