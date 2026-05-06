@@ -13,7 +13,6 @@ const {
 } = require('../controllers/musicController');
 const auth = require('../middleware/authMiddleware');
 
-router.get('/proxy', proxyAudio);
 router.get('/search', searchMusic);
 router.get('/genre/:genre', getGenreMusic);
 router.get('/resolve', resolveStreamUrl);
