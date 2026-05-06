@@ -17,11 +17,12 @@ const { proxyAudio } = require('./controllers/musicController');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+app.get('/proxy', proxyAudio);
+
 app.use(cors());
 app.use(express.json());
 
 
-app.get('/proxy', proxyAudio);
 app.use('/api/auth', authRoutes);
 app.use('/api/music', musicRoutes);
 app.use('/api/favorites', favoriteRoutes);
